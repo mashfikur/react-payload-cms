@@ -16,7 +16,7 @@ type ProductCardType = {
 
 export function ProductsCard({ item }: ProductCardType) {
   return (
-    <Card className="w-full">
+    <Card className="w-full hover:border-transparent duration-300 ease-in-out hover:shadow-2xl">
       <CardHeader>
         {/* product image */}
         <img
@@ -30,7 +30,11 @@ export function ProductsCard({ item }: ProductCardType) {
           <CardDescription>{item.description}</CardDescription>
         </div>
       </CardHeader>
-      <CardContent></CardContent>
+      <CardContent>
+        <p className="text-xl font-light">
+          Price : <span className="font-semibold"> ${item.price} </span>{" "}
+        </p>
+      </CardContent>
 
       <CardFooter className="flex justify-center gap-4">
         <Button>Buy Now</Button>

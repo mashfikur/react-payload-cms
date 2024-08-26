@@ -7,10 +7,12 @@ export const productsApi = createApi({
   }),
   endpoints: (builder) => ({
     getAllProd: builder.query({
-      query: () => `/products`,
+      query: ({ limit }) => `/products?limit=${limit}`,
+    }),
+    getSearchProducts: builder.query({
+      query: (serchTerm) => `/products/search?q=${serchTerm}`,
     }),
   }),
 });
 
-
-export const {useGetAllProdQuery}= productsApi
+export const { useGetAllProdQuery, useGetSearchProductsQuery } = productsApi;
