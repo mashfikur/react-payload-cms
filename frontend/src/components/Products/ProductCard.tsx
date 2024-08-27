@@ -16,11 +16,12 @@ type ProductCardType = {
 
 export function ProductsCard({ item }: ProductCardType) {
   return (
-    <Card className="w-full hover:border-transparent duration-300 ease-in-out hover:shadow-2xl">
-      <CardHeader>
+    <Card className="flex w-full flex-col duration-300 ease-in-out hover:border-transparent hover:shadow-2xl">
+      <CardHeader className="flex-grow p-4">
         {/* product image */}
+
         <img
-          className="h-[350px] w-[350px] object-contain"
+          className="h-[280px] w-[100%] object-contain"
           src={item.images[0]}
           alt=""
         />

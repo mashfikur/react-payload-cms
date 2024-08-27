@@ -7,8 +7,10 @@ import { Input } from "../ui/input";
 import { IoSearchOutline } from "react-icons/io5";
 import { useState } from "react";
 import ProductPagination from "./ProductPagination";
-import { useAppSelector } from "@/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import ProductLimit from "./ProductLimit";
+import { DNA } from "react-loader-spinner";
+import { setDisplayProducts } from "@/redux/features/productSlice";
 
 export type ProductType = {
   title: string;
@@ -28,14 +30,23 @@ const Products = () => {
   // global states
   const prodLimit = useAppSelector((state) => state.product.limit);
   const prodSkip = useAppSelector((state) => state.product.skip);
+  const prodCategory = useAppSelector(
+    (state) => state.product.selectedCategory,
+  );
+  const displayProducts = useAppSelector(
+    (state) => state.product.displayProducts,
+  );
+
+  const dispatch = useAppDispatch();
 
   const dataOptions = {
     limit: prodLimit,
-    skip: prodSkip,
+    skip: prodSkip * prodLimit,
+    category: prodCategory,
   };
 
   // getting all the products
-  const { data } = useGetAllProdQuery(dataOptions);
+  const { data, isLoading } = useGetAllProdQuery(dataOptions);
 
   // search text term storing in state
   const [search, setSearch] = useState("");
@@ -44,9 +55,13 @@ const Products = () => {
   const handleInputChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    const searchText = event.target.value;
+    setTimeout(() => {
+      const searchText = event.target.value;
 
-    setSearch(searchText);
+      console.log(searchText);
+
+      setSearch(searchText);
+    }, 500);
   };
 
   // getting products upon searching
@@ -54,11 +69,11 @@ const Products = () => {
 
   console.log(searchedProducts);
 
-  // storing  product data that want to display
-  const displayProducts = search ? searchedProducts : data;
+  // setting it into state
+  dispatch(setDisplayProducts(search ? searchedProducts : data));
 
   return (
-    <div className="my-12">
+    <div className="w-full">
       <div className="flex items-center justify-between">
         {/* filtering */}
         <div>
@@ -79,22 +94,42 @@ const Products = () => {
         </form>
       </div>
 
-      {/* products grid */}
-      <div className="my-12 grid grid-cols-3 gap-6">
-        {displayProducts &&
-          displayProducts.products.map((item: ProductType, index: number) => (
-            <ProductsCard key={index} item={item} />
-          ))}
-      </div>
+      {/* products area */}
+      <div className="my-12">
+        {isLoading ? (
+          <div className="mx-auto flex h-[50vh] w-fit items-center justify-center">
+            <DNA
+              visible={true}
+              height="80"
+              width="80"
+              ariaLabel="dna-loading"
+              wrapperStyle={{}}
+              wrapperClass="dna-wrapper"
+            />
+          </div>
+        ) : (
+          <div className="space-y-10">
+            {/* products grid */}
+            <div className="grid grid-cols-4 gap-6">
+              {displayProducts &&
+                displayProducts.products.map(
+                  (item: ProductType, index: number) => (
+                    <ProductsCard key={index} item={item} />
+                  ),
+                )}
+            </div>
 
-      {/* products Pagination */}
-      {displayProducts && (
-        <ProductPagination
-          limitProduct={prodLimit}
-          skipItem={prodSkip}
-          totalProducts={displayProducts.total}
-        />
-      )}
+            {/* products Pagination */}
+            {displayProducts && (
+              <ProductPagination
+                limitProduct={prodLimit}
+                skipItem={prodSkip}
+                totalProducts={displayProducts.total}
+              />
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

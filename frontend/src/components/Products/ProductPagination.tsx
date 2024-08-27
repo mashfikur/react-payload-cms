@@ -6,6 +6,8 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { setSkip } from "@/redux/features/productSlice";
+import { useAppDispatch } from "@/redux/hooks";
 import { useState } from "react";
 
 type IncomingProps = {
@@ -19,39 +21,56 @@ const ProductPagination = ({
   skipItem,
   totalProducts,
 }: IncomingProps) => {
+  console.log(skipItem);
+  // global state
+  const dispatch = useAppDispatch();
+
   const [selectedPage, setSelectedPage] = useState(1);
 
-  const pages = Math.ceil(totalProducts / limitProduct);
+  const pages = Math.floor(totalProducts / limitProduct);
 
   const pagesArray = Array(pages)
     .fill(1)
     .map((_, index) => index);
 
-  console.log(pagesArray);
+  const handlePageSelect = (value: number) => {
+    // setting at global stage
+    dispatch(setSkip(value));
+
+    setSelectedPage(value);
+  };
 
   return (
     <div>
       <Pagination>
         <PaginationContent>
           <PaginationItem>
-            <PaginationPrevious href="#" />
+            <PaginationPrevious
+              onClick={() => handlePageSelect(selectedPage - 1)}
+              className="cursor-pointer"
+            />
           </PaginationItem>
-          {pagesArray.map((item, index) => (
-            <PaginationItem
-              onClick={() => setSelectedPage(item + 1)}
-              key={index}
-            >
-              <PaginationLink
-                className="cursor-pointer"
-                isActive={selectedPage === item + 1}
+          <div className="flex flex-wrap">
+            {pagesArray.map((item, index) => (
+              <PaginationItem
+                onClick={() => handlePageSelect(item + 1)}
+                key={index}
               >
-                {item + 1}
-              </PaginationLink>
-            </PaginationItem>
-          ))}
+                <PaginationLink
+                  className="cursor-pointer"
+                  isActive={selectedPage === item + 1}
+                >
+                  {item + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+          </div>
 
           <PaginationItem>
-            <PaginationNext href="#" />
+            <PaginationNext
+              onClick={() => handlePageSelect(selectedPage + 1)}
+              className="cursor-pointer"
+            />
           </PaginationItem>
         </PaginationContent>
       </Pagination>
